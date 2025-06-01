@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.40
+    container_name: mysql-server
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynet
+  mysql-client:
+    image: mysql:8.0
+    volumes:
+      - ./app:/app
+      - ./book:/book
+    depends_on:
+      - mysql
+    entrypoint: >
+      sh -c "sleep 10 && mysql -hmysql -uuser -puserpass mydb"
+    networks:
+      - mynet
+volumes:
+  mysql_data:
+networks:
+  mynet:
